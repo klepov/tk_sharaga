@@ -35,6 +35,7 @@ class Presenter():
 
     def change_pass(self, user, old_pass, new_pass):
         var_reg = r'[a-z]|[,.!?;:()]'
+        var_reg_k = r'[a-z]|[,.!?;:()]|[0-9]'
         if user.password == old_pass:
             if user.mask_password:
                 var_reg = user.mask_password
