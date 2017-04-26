@@ -1,6 +1,7 @@
 import re
 from peewee import DoesNotExist, IntegrityError
 
+from encrypt import crypt
 from model import User, MaskEqualsPassword
 
 
@@ -12,14 +13,14 @@ class Presenter():
                         is_blocked=False,
                         mask_password="",
                         name='admin',
-                        password='admin').save()
+                        password=crypt('admin')).save()
 
     def login(self, login, password):
         user = self.__get_by_name(login)
         if user:
             if not user.password:
                 return "Вводи пароль"
-            if user.password == password:
+            if user.password == crypt(password):
                 if user.is_blocked:
                     return "заблокирован"
                 return user
@@ -36,12 +37,12 @@ class Presenter():
     def change_pass(self, user, old_pass, new_pass):
         var_reg = r'[a-z]|[,.!?;:()]'
         var_reg_k = r'[a-z]|[,.!?;:()]|[0-9]'
-        if user.password == old_pass:
+        if user.password == crypt(old_pass):
             if user.mask_password:
                 var_reg = user.mask_password
             if re.search(var_reg, new_pass):
                 raise MaskEqualsPassword(Exception)
-            user.password = new_pass
+            user.password = crypt(new_pass)
             user.save()
             return True
         else:
@@ -54,7 +55,7 @@ class Presenter():
             var_reg = user.mask_password
         if re.search(var_reg, new_pass):
             raise MaskEqualsPassword(Exception)
-        user.password = new_pass
+        user.password = crypt(new_pass)
         user.save()
         return True
 
